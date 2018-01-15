@@ -1,0 +1,276 @@
+{% extends 'todolist/base.html' %} {% block page %}
+<!-- 单个任务:begin -->
+<div class="panel panel-default" id="container_item_detail">
+    <div class="panel-heading">
+        <h3 class="panel-title" style="display:none;">
+            任务详情
+        </h3>
+    </div>
+    <div class="panel-body">
+        <input type="hidden" name="id">
+        <div class="form-group">
+            <label for="title">标题</label>
+            <input readonly type="text" name="title" id="title" class="form-control" placeholder="请输入标题">
+        </div>
+        <div class="form-group">
+            <label for="description">说明</label>
+            <textarea readonly class="form-control" name="description" id="description" rows="10"></textarea>
+        </div>
+        <div class="form-group">
+            <tbody>
+                <table>
+                    <tr>
+                        <td width="270px;">
+                            <label>已用时间：<b id="used_total_time" /></label>
+                        </td>
+                        <td width="270px;">
+                            <label>预估时间：<b id="total_time" /></label>
+                        </td>
+                    </tr>
+                </table>
+            </tbody>
+        </div>
+        <div class="form-group">
+            <tbody>
+                <table>
+                    <tr>
+                        <td width="250px;">
+                            <label for="step">当前步骤</label>
+                            <select class="form-control" name="step" id="step">
+                                <option value="">请选择一个步骤</option>
+                                {{ step|safe }}
+                            </select>
+                        </td>
+                        <td width="20px;">
+                        </td>
+                        <td width="250px;">
+                            <label for="status">当前状态</label>
+                            <select class="form-control" name="status" id="status">
+                                <option value="">请选择一个状态</option>
+                                {{ status|safe }}
+                            </select>
+                        </td>
+                        <td width="20px;">
+                        </td>
+                        <td width="250px;">
+                            <label for="person_in_charge">当前负责人</label>
+                            <select class="form-control" name="person_in_charge" id="person_in_charge">
+                                <option value="">请选择一个负责人</option>
+                                {{ user|safe }}
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </tbody>
+        </div>
+        <div class="form-group">
+        </div>
+        <div class="form-group">
+            <button type="button" class="btn btn-primary btn-md" operation="save">
+                保存
+            </button>
+            <button type="button" class="btn btn-primary btn-md" operation="cancel">
+                返回
+            </button>
+        </div>
+    </div>
+</div>
+<!-- 单个任务:end -->
+<!-- WorkFlow:begin -->
+<div class="panel panel-default" id="container_item_workflows">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            工作日志
+        </h3>
+    </div>
+    <!-- list:begin -->
+    <div class="panel-body">
+        <div class="form-group">
+            <button operation="add" type="button" class="btn btn-primary btn-md">
+                添加日志
+            </button>
+        </div>
+        <table id="list_item_workflow" class="table table-bordered table-hover table-striped">
+            <thead>
+                <tr>
+                    <th width="20%">工作内容</th>
+                    <th width="20%">工作时长</th>
+                    <th width="20%">添加人</th>
+                    <th width="20%">添加时间</th>
+                    <th width="20%">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr pk="#id#" template=1 style="display: none">
+                    <td>#work#</td>
+                    <td>#minutes#</td>
+                    <td>#user#</td>
+                    <td>#entry_date#</td>
+                    <td>
+                        <a href="javascript:void(0)" operation="del">删除</a>
+                        <a href="javascript:void(0)" operation="edit">修改</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- list:end -->
+</div>
+<!-- add workflow:begin -->
+<div class="modal fade" id="item_workflow_detail">
+    <input type="hidden" name="id">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                添加
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="work">工作内容</label>
+                    <textarea class="form-control" name="work" id="work" rows="10"></textarea>
+                </div>
+                <div class="input-group">
+                    <input type="text" name="minutes" class="form-control" placeholder="工作时长">
+                    <span class="input-group-addon">分钟</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" operation="cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" operation="save">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- add workflow:end -->
+<!-- WorkFlow:end -->
+<script type="text/javascript">
+item_id(Class.Q().item_id)
+
+function populate_item_detail() {
+    if (item_id()) {
+        Class.ajax({
+            url: "{% url 'todolist:item_work_instance' %}",
+            method: "get",
+            data: "id=" + item_id() + Class.csrf(),
+            success: function(data) {
+                $("#container_item_detail").Param(data);
+                $("#total_time").html(data['total_time'] + ' (分钟)');
+                $("#used_total_time").html(data['used_total_time'] + ' (分钟)');
+            }
+        });
+    }
+}
+
+
+function populate_workflow() {
+    if (item_id()) {
+        $("#list_item_workflow").pagingTable({
+            json_url: "{% url 'todolist:item-workflow_list' %}" + '?item_id=' + item_id(),
+        });
+    }
+}
+
+function load() {
+    populate_item_detail();
+    populate_workflow();
+}
+
+load();
+
+$("#container_item_detail").on("click", "button", function() {
+    var operation = $(this).attr("operation");
+    if (operation == "save") {
+        SaveItem();
+    } else if (operation == "cancel") {
+        location = "{% url 'todolist:item' %}"
+    }
+
+})
+
+function SaveItem(){
+    url = "{% url 'todolist:item_edit'%}";
+    Class.ajax({
+            url: url,
+            method: "post",
+            data: $("#container_item_detail").Param() + '&from_flag=item_work' + Class.csrf(),
+            success: function(data) {
+                item_id(data.id);
+                $("#container_item_steps").show();
+            }
+    });
+}
+
+//ItemWork
+$("#container_item_workflows button[operation=add]").click(function() {
+    SaveItem();
+    $("#item_workflow_detail").Reset().modal();
+});
+
+$("#item_workflow_detail").on("click", "button", function() {
+    var operation = $(this).attr("operation");
+    var id = $("#item_workflow_detail").find('input[name=id]').val();
+    url = id ? "{% url 'todolist:item-workflow_edit'%}" : "{% url 'todolist:item-workflow_add'%}";
+
+    if (operation == "save") {
+        Class.ajax({
+            url: url,
+            method: "post",
+            data: $("#item_workflow_detail").Param() + Class.csrf() + '&item_id=' + item_id() + '&step=' + $("#step").val(),
+            success: function(data) {
+                load();
+            }
+        });
+    }
+
+})
+
+$("#list_item_workflow").on("click", "a", function() {
+    var operation = $(this).attr("operation");
+    var id = $(this).parents("tr").attr("pk");
+
+    if (operation == "del") {
+        Class.ajax({
+            url: "{% url 'todolist:item-workflow_delete' %}",
+            method: "post",
+            data: '&id=' + id + Class.csrf(),
+            success: function(data) {
+                load();
+            }
+        });
+    } else if (operation == "edit") {
+        $("#item_workflow_detail").find('input[name=id]').val(id);
+        Class.ajax({
+            url: "{% url 'todolist:item-workflow_edit' %}",
+            method: "get",
+            data: '&id=' + id,
+            success: function(data) {
+                $("#item_workflow_detail").modal().Param(data);
+            }
+        });
+    }
+
+});
+
+$("#step, #status, #person_in_charge").change(function() {
+    check_step_and_status();
+});
+
+function check_step_and_status() {
+    if ($("#step").val() == '' || $("#status").val() == '' || $("#person_in_charge").val() == '') {
+        $("#container_item_detail button[operation=save]").attr('disabled', 'disabled');
+        $("#container_item_workflows").hide();
+    } else {
+        $("#container_item_detail button[operation=save]").removeAttr('disabled');
+        $("#container_item_workflows").show();  
+    }
+}
+
+function item_id(id) {
+    if (id) {
+        $("#container_item_detail").find('input[name=id]').val(id);
+    } else {
+        return $("#container_item_detail").find('input[name=id]').val();
+    }
+}
+</script>
+{% endblock %}

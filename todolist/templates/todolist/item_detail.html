@@ -1,0 +1,97 @@
+{% extends 'todolist/base.html' %} {% block page %}
+<!-- 单个任务:begin -->
+<div class="panel panel-default" id="container_item_detail">
+    <div class="panel-heading">
+        <h3 class="panel-title" style="display:none;" mel="add">
+            添加待办事项
+        </h3>
+        <h3 class="panel-title" style="display:none;" mel="edit">
+            修改待办事项
+        </h3>
+    </div>
+    <div class="panel-body">
+        <input type="hidden" name="id">
+        <div class="form-group">
+            <label for="title">标题</label>
+            <input type="text" name="title" id="title" class="form-control" placeholder="请输入标题">
+        </div>
+        <div class="form-group">
+            <label for="description">说明</label>
+            <textarea class="form-control" name="description" id="description" rows="10"></textarea>
+        </div>
+         <div class="form-group">
+            <label for="minutes">预估时间</label>
+            <input type="text" name="minutes" class="form-control" placeholder="请输入一个整数值">
+        </div>
+        <div class="form-group">
+            <button type="button" class="btn btn-primary btn-md" operation="save">
+                保存
+            </button>
+            <button type="button" class="btn btn-primary btn-md" operation="cancel">
+                返回
+            </button>
+        </div>
+    </div>
+</div>
+<!-- 单个任务:end -->
+
+<script type="text/javascript">
+item_id(Class.Q().item_id)
+
+function populate_item_detail() {
+    if (item_id()) {
+        Class.ajax({
+            url: "{% url 'todolist:item_instance' %}",
+            method: "get",
+            data: "id=" + item_id() + Class.csrf(),
+            success: function(data) {
+                $("#container_item_detail").Param(data);
+            }
+        });
+    }
+}
+
+function load() {
+    var container_item_detail = $("#container_item_detail");
+    if (item_id()) {
+        container_item_detail.find("h3[mel=add]").hide();
+        container_item_detail.find("h3[mel=edit]").show();
+    } else {
+        container_item_detail.find("h3[mel=add]").show();
+        container_item_detail.find("h3[mel=edit]").hide();
+    }
+
+    populate_item_detail();
+}
+
+load();
+
+$("#container_item_detail").on("click", "button", function() {
+    var operation = $(this).attr("operation");
+    var id = $("#container_item_detail").find('input[name=id]').val();
+    url = id ? "{% url 'todolist:item_edit'%}" : "{% url 'todolist:item_add'%}";
+
+    if (operation == "save") {
+        Class.ajax({
+            url: url,
+            method: "post",
+            data: $("#container_item_detail").Param() + '&from_flag=item_step' + Class.csrf(),
+            success: function(data) {
+                location = "{% url 'todolist:item' %}"
+            }
+        });
+    } else if (operation == "cancel") {
+        location = "{% url 'todolist:item' %}"
+    }
+
+})
+
+function item_id(id) {
+    if (id) {
+        $("#container_item_detail").find('input[name=id]').val(id);
+    } else {
+        return $("#container_item_detail").find('input[name=id]').val();
+    }
+}
+</script>
+{% endblock %}

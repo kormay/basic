@@ -1,0 +1,33 @@
+{% extends 'resource/root.html' %} {% block welcome %}
+<a href="{% url 'todolist:item' %}" class="navbar-brand">欢迎进入任务管理系统</a> {% endblock %} {% block main %}
+<hr>
+<div class="row">
+    <div class="col-md-3">
+        <div class="panel-group" id="menu">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a class="panel-title" data-toggle="collapse" data-parent="#menu" href="#panel-element-I">
+                        <span>任务管理</span>
+                    </a>
+                </div>
+                <div class="panel-collapse collapse in" id="panel-element-I">        
+                    <div class="panel-body">
+                        <a href="{% url 'todolist:item'%}">任务管理</a>
+                    </div>
+                    <div class="panel-body">
+                        <a href="{% url 'todolist:step'%}">步骤管理</a>
+                    </div>
+                    <div class="panel-body">
+                        <a href="{% url 'todolist:status'%}">状态管理</a>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- main page -->
+    <div class="col-md-9" id="page">
+        {% block page %} {% endblock %}
+    </div>
+</div>
+<div class="row" style="height:150px"></div>
+{% endblock %}

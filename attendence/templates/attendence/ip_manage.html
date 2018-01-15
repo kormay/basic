@@ -1,0 +1,137 @@
+{% extends 'base.html' %} {% block page %}{% load staticfiles %}
+<script type="text/javascript">
+$(function() {
+
+    function pagingTable() {
+        $("#iplisttable").pagingTable({
+            json_url: "{% url 'attendence:ip_get_list'%}",
+            pageSize: 2,
+            callback: function() {
+                console.log('this is callback of pagingTable...');
+            }
+        });
+    }
+    //init the table and page bar
+    pagingTable();
+
+    //saveip, cancelip
+    $("#saveip").on("click", function() {
+        //save data 
+        if ($("#user_name").val() == 0) {
+            alert("Please select an employee.");
+            $("#user_name").focus();
+            return false;
+        }
+
+        var param = $.param($('#addipModal :input:not(button)'));
+        $.ajax({
+            url: "{% url 'attendence:ip_add'%}",
+            method: "post",
+            data: param + "&csrfmiddlewaretoken=" + $.cookie('csrftoken'),
+            success: function(data) {
+                $("#cancelip").click();
+                $("#user_name").val(0);
+                $("#ip").val('192.168.1.');
+                var msg = "New IP added.";
+                if (data == 0) {
+                    msg = "IP already existed.";
+                    alert(msg);
+                } else {
+                    pagingTable();
+                }
+            }
+        });
+    });
+});
+
+
+
+function del_ip(obj) {
+    if (confirm("Are you sure to delete this record?")) {
+        var ip = $(obj).parents("tr").find("td:eq(1)").html();
+
+        $.ajax({
+            url: "{% url 'attendence:ip_delete'%}",
+            data: {
+                ip: ip,
+                csrfmiddlewaretoken: $.cookie('csrftoken')
+            },
+            method: "POST",
+            success: function(data) {
+                pagingTable();
+            }
+        });
+    }
+}
+</script>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            <strong>{{title}}</strong>
+        </h3>
+    </div>
+    <div class="panel-body">
+        <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#addipModal">
+            添加新IP
+        </button>
+        <hr/>
+        <div id="pagerdiv">
+            <table id="iplisttable" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th width="20%">姓名</th>
+                        <th width="20%">IP</th>
+                        <th width="20%">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr pk="#ip#" template=1 style="display: none">
+                        <td>#name#</td>
+                        <td>#ip#</td>
+                        <td>
+                            <a href="javascript:void(0)" onclick="del_ip(this)" class="delip" style="cursor:pointer">
+                                <span><span class="glyphicon glyphicon-trash"></span> (#ip#)</span>
+                            </a>
+                            <!-- <a style="cursor:pointer;display:inline-block;margin-left:15px;">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a> -->
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- add ip window -->
+        <div class="modal fade" id="addipModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        添加新IP
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="user_name">姓名:</label>
+                            <select id="user_name" name="user_name" class="form-control">
+                                <option value="0">请选择一个用户...</option>
+                                {%for user in userlist%}
+                                <option value="{{user.user_name}}">{{user.name}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ip">IP Address:</label>
+                            <input type="text" class="form-control" id="ip" name="ip" placeholder="IP Address" value='192.168.1.'>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="cancelip" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button id="saveip" type="button" class="btn btn-primary">保存</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <style type="text/css">
+    ul li{
+        margin: 2px;
+        border: 1px solid #000;
+    }
+    </style>
+    <script src="http://common.cnblogs.com/script/jquery.js"></script>
+    <script type="text/javascript">
+    $.fn.ad = function(evtName, selector, func) {
+        $(this).bind(evtName, function(event) {
+            window.evt = event
+            window.toelement = $(event.toElement);
+            if ($("<div></div>").append(toelement.clone()).find(selector).length ==1) {
+                func.apply(toelement, arguments);
+            }
+        });
+        return $(this);
+    }
+    $(function() {
+        $('ul').ad('click', 'li', function(event) {
+            console.log($(this).html());
+        });
+    });
+    </script>
+</head>
+
+<body>
+    <ul>
+        <li>AAAAA</li>
+        <li>BBBBB</li>
+        <li>CCCCC</li>
+    </ul>
+</body>
+
+</html>

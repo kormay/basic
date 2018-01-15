@@ -1,0 +1,74 @@
+{% extends 'workflow/base.html' %} {% block head %} {% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'workflow/css/catalogue.css' %}">
+<script type="text/javascript" src="{% static 'workflow/js/catalogue.js' %}"></script>
+<script type="text/javascript">
+$(function($) {
+    var data = {
+        catalogue: [{
+            title: "Content",
+            enable_add: true,
+            add_desc: "新增流程",
+            add_event: test1,
+            items: [{
+                id: "1",
+                title: "asdf",
+                desc: "随便",
+                content: "定义流程",
+                event: test,
+            }, {
+                id: "2",
+                title: "asdf",
+                desc: "随便",
+                content: "定义流程",
+                event: test,
+            }, {
+                title: "asdf",
+                desc: "随便",
+                content: "定义流程"
+            }, {
+                title: "asdf",
+                desc: "随便",
+                content: "定义流程"
+            }]
+        }, {
+            title: "Content",
+            items: [{
+                title: "asdf",
+                desc: "随便",
+                content: "定义流程"
+            }, {
+                title: "asdf",
+                desc: "随便",
+                content: "定义流程"
+            }, {
+                title: "asdf",
+                desc: "随便",
+                content: "定义流程"
+            }]
+        }]
+    };
+    $('#catalogue').Catalogue(data);
+
+    function test(event) {
+        alert(event.data.id);
+    }
+
+    function test1() {
+        // alert(window.location.host);
+        //alert(window.location.href);
+        url = 'http://' + window.location.host + '/workflow/define/';
+        alert(url);
+        window.open(url);
+    }
+});
+</script>
+{% endblock %} {% block page %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title"> 
+            <strong>Process Template</strong>
+        </h3>
+    </div>
+    <div class="panel-body" id='catalogue'>
+    </div>
+</div> {% endblock %}

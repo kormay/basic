@@ -1,0 +1,52 @@
+{% extends 'secu/base.html' %} {% block page %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            权限管理
+        </h3>
+    </div>
+    <!-- list -->
+    <div class="panel-body">
+        <table id="list_right" class="table table-bordered table-hover table-striped">
+            <thead>
+                <tr #!attendence.views.account.check_old_password!#>
+                    <th colspan="5">
+                        <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#addipModal">
+                            添加权限
+                        </button>
+                    </th>
+                </tr>
+                <tr>
+                    <th width="20%">权限名称</th>
+                    <th width="20%">视图名称</th>
+                    <th width="20%">详细信息</th>
+                    <th width="20%">正则匹配</th>
+                    <th width="20%">选择器</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr pk="#id#" template=1 style="display: none">
+                    <td>#name#</td>
+                    <td>#view_name#</td>
+                    <td>#detail#</td>
+                    <td>#pattern#</td>
+                    <td>#selector#</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div #!attendence.views.account.change_password!# >
+        <h1>   asdfasdfasdfasdf</h1><span>asdfasdfasdf</span>
+    </div>
+    <!-- list -->
+</div>
+<script type="text/javascript">
+$("#list_right").pagingTable({
+    json_url: "{% url 'secu:right_list' %}",
+    pageSize: 10,
+    callback: function() {
+        console.log('this is callback of pagingTable...');
+    }
+});
+</script>
+{% endblock %}

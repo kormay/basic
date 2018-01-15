@@ -1,0 +1,133 @@
+{% extends "cms/base.html" %}
+{% block page %}
+<!-- include summernote css/js-->
+<link href="../../static/bootstrap/summernote/summernote.css" rel="stylesheet">
+<script src="../../static/bootstrap/summernote/summernote.js"></script>
+
+<!-- <input type="text" id="content_hide" value="{{content.description}}"> -->
+
+<br>
+<form id="blog_info" class="bs-example bs-example-form" role="form">
+    <div class="input-group col-sm-12">
+        <span class="input-group-addon">标题</span>
+        <input id="title" type="text" class="form-control" value="{{content.title}}" placeholder="请输入标题">
+    </div>
+    <br>
+    <div id="summernote">{{content.description|safe}}</div>
+    <br>
+    <div class="input-group col-sm-12">
+        <span class="input-group-addon">关键字</span>
+        <input id="keys" type="text" class="form-control" value="{{word}}" placeholder="请输入关键字，以逗号隔开">
+        <div class="input-group-btn">
+            <button type="button" class="btn btn-primary 
+                 dropdown-toggle" data-toggle="dropdown">
+                 添加已有关键字 
+                <span class="caret"></span>
+            </button>
+            <ul id="keys_dropdown" class="dropdown-menu">
+                {% for item in key_word %}
+                <li name="key_value" key="{{item.word}}"><a href="javascript:void(0);">{{item.word}}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <br>
+    <div class="input-group col-sm-4">
+        <select id="category" name="category" class="form-control">
+            <option value="0">请选择分类...</option>
+            {% for item in category %}
+            <option value="{{item.code}}">{{item.title}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <br>    
+    <div class="btn-group">
+    <button id="save" type="button" pk="{{id}}" class="btn btn-primary">保存</button>
+    <button id="cancel" type="button" class="btn btn-primary">取消</button>
+    </div>
+</form>
+
+<script type="text/javascript">
+    $(function() {
+        $('#summernote1').summernote();
+        $('#summernote').summernote({
+            height:300,
+            minHeight:null,
+            maxHeight:null,
+            focus:true,
+            placeholder:'请输入内容...',
+            toolbar:[
+                ['style',['bold', 'italic', 'underline', 'clear']],
+                ['font',['strikethrough', 'superscript', 'subscript']],
+                ['fontsize',['fontname','fontsize','color']],
+                ['para',['ul','ol','paragraph']],
+                ['insert',['link','picture']],
+                ['misc',['codeview','help']],
+            ]
+        });
+
+        $('#save').click(function(){
+            if ($('#summernote').summernote('isEmpty')) {
+                Confirm.show('Message','请输入内容...');
+            }
+            else if($('#title').val()==''){
+                Confirm.show('Message','请输入标题...')
+            }
+            else{
+                var title = $('#title').val();
+                var content = $('#summernote').summernote('code');
+                var keys = $('#keys').val();
+                var category = $('#category').val();
+                var id = $('#save').attr("pk");
+                if(id == ''){
+                    Class.ajax({
+                        type:"POST",
+                        url:"{% url 'cms:add' %}",
+                        data:{
+                            "title":title,
+                            "content":content,
+                            "keys":keys,
+                            "category":category,
+                            "csrfmiddlewaretoken":$.cookie('csrftoken')
+                        },
+                        dataType:"text",
+                        success:function(response){
+                            Confirm.show('Message', response);
+                        }
+                    });
+                }
+                else{
+                    Class.ajax({
+                        type:"POST",
+                        url:"{% url 'cms:edit' %}",
+                        data:{
+                            "id":id,
+                            "title":title,
+                            "content":content,
+                            "keys":keys,
+                            "category":category,
+                            "csrfmiddlewaretoken":$.cookie('csrftoken')
+                        },
+                        dataType:"text",
+                        success:function(response){
+                            Confirm.show('Message', response);
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+    $('li[name=key_value]').click(function(){
+        var key = $(this).attr('key');
+        if($('#keys').val()==''){
+            $('#keys').val(key);
+        }else{
+            $('#keys').val($('#keys').val() + ',' + key);
+        }
+    });
+</script>
+
+
+
+{% endblock %}

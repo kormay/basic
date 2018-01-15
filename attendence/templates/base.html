@@ -1,0 +1,63 @@
+{% extends 'resource/root.html' %} {% block welcome %}
+<a href="{% url 'attendence:index' %}" class="navbar-brand">欢迎来到考勤考勤系统</a> {% endblock %} {% block additional %}
+<div class="jumbotron" style="background-color:#EEDFCC">
+    <div class="container">
+        <h1>考勤系统</h1>
+        <h3>美国麦克思信息系统有限公司深圳代表处考勤管理系统。——— 美国麦克思中国办公室</h3>
+    </div>
+</div>
+{% endblock %} {% block main %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="panel-group" id="menu">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <a class="panel-title" data-toggle="collapse" data-parent="#menu" href="#panel-element-I">
+                        <span class="glyphicon glyphicon-home"></span> 系统管理
+                    </a>
+                </div>
+                <div class="panel-collapse collapse in" id="panel-element-I">
+                    <div class="panel-body">
+                        <a href="{% url 'attendence:punch_index' %}">打卡管理</a>
+                    </div>
+                    <div class="panel-body">
+                        <a href="{% url 'attendence:ip_manage' %}">IP管理</a>
+                    </div>
+                    <div class="panel-body">
+                        <a href="{% url 'attendence:change_password' %}">修改密码</a>
+                    </div>
+                    <div class="panel-body">
+                        <a href="{% url 'attendence:leave_manage' %}">离开</a>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <a class="panel-title collapsed" data-toggle="collapse" data-parent="#menu" href="#panel-element-II">
+                        <span class="glyphicon glyphicon-signal"></span> 统计
+                    </a>
+                </div>
+                <div id="panel-element-II" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <a href="{% url 'attendence:validator_index' %}">每日打卡信息</a>
+                    </div>
+                    <div class="panel-body">
+                        <a href="#">月打卡信息</a>
+                    </div>
+                    <div class="panel-body">
+                        <a href="#">请假/调休剩余</a>
+                    </div>
+                    <div class="panel-body">
+                        <a href="{% url 'login' %}">退出</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- main page -->
+    <div class="col-md-9" id="page">
+        {% block page %} {% endblock %}
+    </div>
+</div>
+<div class="row" style="height:150px"></div>
+{% endblock %}

@@ -1,0 +1,22 @@
+var obj = {
+    title : "hello", 
+    steps:[
+        {"name":"lucy", "age":21},
+        {"name":"jim", "age":22}
+    ]
+}
+
+
+<data>
+    <title>hello</title>
+    <steps>
+        <instance>
+            <name>lucy</name>
+            <age>21</age>
+        </instance>
+        <instance>
+            <name>jim</name>
+            <age>22</age>
+        </instance>
+    </steps>
+</data>

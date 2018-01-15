@@ -1,0 +1,15 @@
+[{
+    "model":"workflow.ProcessCategory",
+    "fields":{
+        "code":"1001",
+        "name":"attendence",
+        "level":1
+    }
+},{
+    "model":"workflow.ProcessCategory",
+    "fields":{
+        "code":"1002",
+        "name":"contract",
+        "level":1
+    }
+}]

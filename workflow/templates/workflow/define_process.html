@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+
+<<<<<<< HEAD
+<head>
+    {% load staticfiles %}
+    <title>{{ title_text }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" media="screen">
+    <link href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet" media="screen">
+    <link href="{% static 'attendence/base.css' %}" rel="stylesheet" media="screen">
+    <link href="{% static 'workflow/jqueryui/jquery-ui.min.css' %}" rel="stylesheet" media="screen">
+    <script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}" charset="UTF-8"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/js/locales/bootstrap-datetimepicker.fr.js' %}" charset="UTF-8"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/js/confirm.js' %}" charset="UTF-8"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap-confirm.js' %}" charset="UTF-8"></script>
+    <script type="text/javascript" src="{% static 'js/jqExtend.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/pager.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.cookie.js' %}"></script>
+    <script type="text/javascript" src="{% static 'workflow/jqueryui/jquery-ui.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'workflow/css/bootstrap-treeview.css' %}">
+    <!-- <link rel="stylesheet" type="text/css" href="{% static 'workflow/css/bootstrap-select.min.css' %}"> -->
+    <script type="text/javascript" src="{% static 'workflow/js/Elastic.js' %}"></script>
+    <script type="text/javascript" src="{% static 'workflow/js/json2.js' %}"></script>
+    <script type="text/javascript" src="{% static 'workflow/js/bootstrap-treeview.js' %}"></script>
+    <!-- <script type="text/javascript" src="{% static 'workflow/js/bootstrap-select.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'workflow/js/defaults-zh_CN.js' %}"></script> -->
+    <style type="text/css">
+    .body-layout {
+        width: 100%;
+        min-height: 510px;
+        overflow: scroll;
+        border-left-width: 1px;
+        border-left-style: solid;
+        border-left-color: #ddd;
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+    }
+    
+    div[fn-type='drag'].active {
+        background-color: #66afe9;
+        border-width: 1px;
+        border-color: #66afe9;
+        outline: 0;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+    }
+    </style>
+    <script type="text/javascript">
+    $(function($) {
+        LimitRightMenu();
+        var orign_top = 0;
+        var orign_left = 0;
+        var goal_top = 0;
+        var goal_left = 0;
+        var steps = new StepAdapter();
+        $('#chart').mousedown(function(e) {
+            if (CheckKey() == 3) {
+                $('#chart_menu').removeClass('hidden');
+                var corleft = event.clientX + $('body').scrollLeft();
+                var corTop = event.clientY + $('body').scrollTop();
+                $("#chart_menu").offset({
+                    left: corleft,
+                    top: corTop
+                });
+            } else {
+                if ($(event.srcElement).is('#chart')) {
+                    $('#chart_menu').addClass('hidden');
+                }
+=======
+div[fn-type='drag'].active {
+    background-color: #66afe9;
+    border-width: 1px;
+    border-color: #66afe9;
+    outline: 0;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+}
+</style>
+<script type="text/javascript">
+$(function($) {
+    LimitRightMenu();
+    var orign_top = 0;
+    var orign_left = 0;
+    var goal_top = 0;
+    var goal_left = 0;
+    var steps = new StepAdapter();
+    $('#chart').mousedown(function(e) {
+        if (CheckKey() == 3) {
+            $('#chart_menu').removeClass('hidden');
+            var corleft = event.clientX + $('body').scrollLeft();
+            var corTop = event.clientY + $('body').scrollTop();
+            $("#chart_menu").offset({
+                left: corleft,
+                top: corTop
+            });
+        } else {
+            if ($(event.srcElement).is('#chart')) {
+                $('#chart_menu').addClass('hidden');
+>>>>>>> 4a021aa990f162810f80c9cc29be634036eca6e0
+            }
+        });
+        $('#chart_menu').find('button[name=step_create]').on('click', function() {
+            $('#chart_menu').addClass('hidden');
+            steps.CreateStep(null, event.clientX + $('body').scrollLeft(), event.clientY + $('body').scrollTop());
+        });
+        steps.InitializeStep();
+
+        $('#step_info').on('show.bs.modal', function(e) {
+            //可以写step加载的一些控制逻辑
+            var obj = $('div[fn-type=drag].active');
+            if (obj && obj.length == 1) {
+                steps.Param($('div[fn-type=drag].active').data('data_source'));
+            } else {
+                $('#step_info').modal('hide');
+            }
+        });
+
+        $('#step_info').on('hide.bs.modal', function(e) {
+            steps.Clear();
+        });
+
+        $('#step_save').on('click', function() {
+            var data_source = {};
+            var result_source = $('#step_info').Param(null, true);
+            $.each(steps.step_template.step_new, function(key, value) {
+                data_source[key] = result_source[key];
+            });
+            $('div[fn-type=drag].active').data('data_source', data_source);
+            $('#step_info').modal('hide');
+        });
+
+        $('#save').on('click', function() {
+            var result_json = [];
+            result_json = {};
+            //process 
+            result_json["process_info"] = $('#info').Param(null, true);
+            //steps
+
+            var steps_json = [];
+            $('div[fn-type=drag]').each(function() {
+                var data_source = $(this).data('data_source');
+                if (data_source) {
+                    data_source.order = $(this).attr('order');
+                    data_source.coordinate_x = $(this).css('left');
+                    data_source.coordinate_y = $(this).css('top');
+                    steps_json.push(data_source);
+                }
+            });
+            result_json["steps"] = steps_json;
+            //relations
+            relations_json = [];
+            $('a[route]').each(function() {
+                var relation_json = {
+                    relation: $(this).attr('route')
+                };
+                relations_json.push(relation_json);
+            });
+            result_json["relations"] = relations_json;
+            $.ajax({
+                url: "{% url 'workflow:define_process_save' %}",
+                async: true,
+                type: 'POST',
+                dataType: 'text',
+                data: "data=" + JSON.stringify(result_json),
+                success: function(result) {
+
+                }
+            });
+        });
+    });
+    </script>
+</head>
+
+<body>
+    <div class="container-fluid padding_0">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="header">
+                    <span>流程定义</span>
+                </div>
+            </div>
+        </div>
+        <div class="row main">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"> 
+                        <strong>Process Template</strong>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div>
+                        <!-- tab -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#info" aria-controls="info" role="tab" data-toggle="tab">Infomation</a></li>
+                            <li role="presentation"><a href="#chart" aria-controls="chart" role="tab" data-toggle="tab">Flow Chart</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <!-- 流程基本信息页面 -->
+                            <div role="tabpanel" class="tab-pane form-group active" id="info">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="form-group col-sm-6">
+                                            <input type="text" id="name" name="name" class="form-control" placeholder="Process Name" />
+                                        </div>
+                                        <div class=" form-group col-sm-6">
+                                            <input type="text" id="title" name="title" class="form-control" placeholder="Process Title" />
+                                        </div>
+                                        <div class="form-group col-sm-6">
+                                            <input type="text" id="form_source" name="form_source" class="form-control" placeholder="Form Source" />
+                                        </div>
+                                        <div class="form-group col-sm-6">
+                                            <input type="text" id="data_source" name="data_source" class="form-control" placeholder="Data Source" />
+                                        </div>
+                                        <div class="form-group col-sm-6">
+                                            <select id="category" name="category" class="form-control">{{category|safe}}</select>
+                                        </div>
+                                    </div>
+                                    <div class="panel-footer text-right">
+                                        <button id="cancel" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                        <button id="save" type="button" class="btn btn-primary">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 流程图画板 -->
+                            <div role="tabpanel" class='body-layout tab-pane col-md-12' id='chart'>
+                                <!-- 步骤拖拽模板 -->
+                                <div class="panel panel-default hidden" template="True" style="width:120px;height:100px;position:absolute;" fn-type="drag">
+                                    <div class="panel-heading text-center" name="head"></div>
+                                    <div class="panel-body"> left:<span name="left"></span>
+                                        <br/> top: <span name="top"></span>
+                                    </div>
+                                </div>
+                                <!-- 右键菜单 -->
+                                <div class="btn-group-vertical hidden" role="group" id="chart_menu" style="position:absolute;" aria-label="...">
+                                    <button type="button" class="btn btn-default" name="step_create">Create</button>
+                                    <button type="button" class="btn btn-default" name="step_edit">Edit</button>
+                                    <button type="button" class="btn btn-default" name="step_delete">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 步骤详细信息弹出框 -->
+                    <div id="step_info" class="modal fade" role="dialog" aria-labelledby="modal-title">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title text-center">Step Infomation</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <input type="text" id="name" name="name" class="form-control" placeholder="Step Name" />
+                                    </div>
+                                    <div class="input-group">
+                                        <input type="text" id="author" name="author" class="form-control" placeholder="Author" />
+                                        <span class="input-group-btn"> 
+                                <button class="btn btn-default glyphicon glyphicon-search" style="top:0px;" type="button"></button>
+                            </span>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary" id='step_save'>Save changes</button>
+                                </div>
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                    <!-- /.modal -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

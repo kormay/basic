@@ -1,0 +1,37 @@
+.catalogue-inner li {
+    list-style-type: none;
+    height: 120px;
+}
+
+.catalogue-inner li a {
+    text-decoration: none;
+    display: block;
+}
+
+.catalogue-inner li a:hover {
+    padding: 5px 0px 5px 0px;
+    border: 1px solid #66afe9;
+    border-radius: 4px;
+}
+
+.catalogue-item-title {
+    color: #171d25;
+}
+
+.catalogue-item-desc {
+    color: #74777c;
+}
+
+.catalogue-head-total {
+    margin-left: 20px;
+    margin-bottom: 3px;
+}
+
+
+.catalogue-item-add div {
+    background-image: url("/static/workflow/image/more_icon.png");
+    display: inline-block;
+    width: 80px;
+    height: 65px;
+    background-repeat: no-repeat;
+}

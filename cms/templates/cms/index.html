@@ -1,0 +1,46 @@
+{% extends 'cms/base.html' %} 
+{% block page %}
+{% for item in content_list %}
+<div>
+
+    <h2>
+        <a href="{% url 'cms:get_content_list_by_filter' item.id %}" pk="{{ item.id }}"> {{ item.title }} </a>
+    </h2>
+    <h6>{{ item.entry_date }}</h6>
+             
+    
+    <p name="content">
+    </p>
+    <p mel="part_one" class="hide">
+        {{ item.description_part_one }}
+    </p>
+    <p mel="part_two" class="hide">
+        {{ item.description_part_two }}
+    </p>
+    <p>
+        <a href="javascript: void(0);" class="btn" name="link_view_detail">查看全部 >> </a>
+        <a href="javascript: void(0);" class="btn" name="link_hide_detail" style="display:none">收起 << </a>
+    </p>
+</div>
+<hr>
+{% endfor %}
+
+<script type="text/javascript">
+    $(function(){
+        $('p[name=content]').html(function(){
+            return $(this).next().text();
+        });
+    });
+    $("a[name=link_view_detail]").click(function(){
+        $(this).hide();
+        $(this).parent().prev().prev().prev().html($(this).parent().prev().prev().text()+$(this).parent().prev().text())
+        $(this).next().show();
+    });
+
+    $("a[name=link_hide_detail]").click(function(){
+        $(this).hide();
+        $(this).parent().prev().prev().prev().html($(this).parent().prev().prev().text());
+        $(this).prev().show();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends 'base.html' %} {% block head %} {% load staticfiles %}
+<script>
+$(function($) {
+    function init_employee_list() {
+        $('#employee_list_table').pagingTable({
+            json_url: "{% url 'attendence:get_list'%}",
+            pageSize: 10,
+            separatorL: '#'
+        });
+    }
+    init_employee_list();   
+    $('#employee_save').on("click", function() {
+        if ($('#user_id').val() != "") {
+            $.ajax({
+                url: "/attendence/employee/manage/edit",
+                async: true,
+                type: 'POST',
+                dataType: 'text',
+                data: $("#employee_info").param() + '&csrfmiddlewaretoken=' + $.cookie('csrftoken') +
+                    "&user_id=" + $('#user_id').val(),
+                success: function(result) {
+                    $("#employee_info").modal('hide');
+                    if (result == "success") {
+                        init_employee_list();
+                    }
+                }
+            });
+        } else {
+            $.ajax({
+                url: "/attendence/employee/manage/add",
+                async: true,
+                type: 'POST',
+                dataType: 'text',
+                data: $("#employee_info").param() + '&csrfmiddlewaretoken=' + $.cookie('csrftoken'),
+                success: function(result) {
+                    $("#employee_info").modal('hide');
+                    if (result == "success") {
+                        init_employee_list();
+                    }
+                }
+            });
+        }
+    });
+    $('#employee_info').on('shown.bs.modal', function(e) {
+        if ($(e.relatedTarget).is('#employee_add')) {} else if ($(e.relatedTarget).is("button[name='employee_edit']")) {
+            data = [];
+            $(e.relatedTarget).parents('tr').find('td[field]').each(function(index, obj) {
+                data.push('"' + $(this).attr('field') + '":"' + $(this).text() + '"');
+            });
+            $('#user_id').val($(e.relatedTarget).data('pk'));
+            $('#employee_info').param('{' + data.join(',') + '}');
+            $('#user_name').attr('disabled', true);
+        }
+    });
+    $('#employee_info').on('hide.bs.modal', function(e) {
+        $('#employee_info').clear();
+        $('#user_name').removeAttr('disabled');
+    });
+
+    $('#employee_list_table').on('click', 'button[name=employee_delete]', function() {
+        var user_id = $(this).attr('data-pk');
+        $.confirm('Are you sure to delete this employee?', function(status) {
+            if (status) {
+                $.ajax({
+                    url: "/attendence/employee/manage/delete",
+                    async: true,
+                    type: 'POST',
+                    dataType: 'text',
+                    data: 'pk=' + user_id + '&csrfmiddlewaretoken=' + $.cookie('csrftoken'),
+                    success: function(result) {
+                        if (result == 'success') {
+                            init_employee_list();
+                        }
+                    }
+                });
+            }
+        })
+    });
+});
+</script>
+{% endblock %} {% block page %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            <strong>Employee Infomation</strong>
+        </h3>
+    </div>
+    <div class="panel-body">
+        <div>
+            <button id="employee_add" type="button" class="btn btn-primary btn-md" data-toggle="modal" data-backdrop="static" data-target="#employee_info">
+                Add New Employee
+            </button>
+        </div>
+        <hr/>
+        <div id="div_employee_list">
+            <table id="employee_list_table" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th width="20%">User Name</th>
+                        <th width="20%">First Name</th>
+                        <th width="20%">Last Name</th>
+                        <th width="20%">Email</th>
+                        <th width="20%">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr pk="#user_id#" template=1 style="display: none">
+                        <td field="user_name">#user_name#</td>
+                        <td field="first_name">#first_name#</td>
+                        <td field="last_name">#last_name#</td>
+                        <td field="email">#email#</td>
+                        <td>
+                            <div class="btn-group" role="group" aria-label="...">
+                                <button name="employee_delete" type="button" class="btn btn-primary btn-xs" data-pk="#user_id#"><span class="glyphicon glyphicon-trash"></span></button>
+                                <button name="employee_edit" type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#employee_info" data-pk="#user_id#"><span class="glyphicon glyphicon-edit"></span></button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="employee_info" tabindex="-1" class="modal fade" role="dialog" aria-labelledby="employee_title">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="employee_title">Employee Infomation</h4>
+                    </div>
+                    <div class="modal-body form-horizontal">
+                        <div class="form-group hidden">
+                            <label for="user_id" class="col-sm-3 control-label">pk</label>
+                            <div class="col-sm-9">
+                                <input class="form-control" id="user_id" name="user_id" type="text" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="user_name" class="col-sm-3 control-label">User Name:</label>
+                            <div class="col-sm-9">
+                                <input class="form-control" id="user_name" name="user_name" type="text" placeholder="User Name" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="first_name" class="col-sm-3 control-label">First Name:</label>
+                            <div class="col-sm-9">
+                                <input class="form-control" id="first_name" name="first_name" type="text" placeholder="First Name" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="last_name" class="col-sm-3 control-label">Last Name:</label>
+                            <div class="col-sm-9">
+                                <input class="form-control" id="last_name" name="last_name" type="text" placeholder="Last Name" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="col-sm-3 control-label">Email:</label>
+                            <div class="col-sm-9">
+                                <input class="form-control" id="email" name="email" type="email" placeholder="Email" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="employee_save" type="button" class="btn btn-primary">Save</button>
+                            <button id="cancel" type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

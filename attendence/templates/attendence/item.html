@@ -1,0 +1,59 @@
+{% extends 'base.html' %} {% block page %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            <strong>SECTION TITLE</strong>
+        </h3>
+    </div>
+    <!-- title
+    detail
+    item_status
+    item_priority 
+    employee_in_charge -->
+    <div class="panel-body">
+        <!-- active, sucess, warning, danger -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        Title
+                    </th>
+                    <th>
+                        Created Date
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                    <th>
+                        Priority
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in item_list %}
+                <tr>
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
+                    <td>
+                        {{ item.title }}
+                    </td>
+                    <td>
+                        {{ item.entry_date }}
+                    </td>
+                    <td>
+                        {{ item.get_item_status_display }}
+                    </td>
+                    <td>
+                        {{ item.get_item_priority_display }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

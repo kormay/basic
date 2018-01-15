@@ -1,0 +1,77 @@
+{% extends 'base.html' %} {% block head %} {% load staticfiles %}
+<script>
+$(function($) {
+    var validator = Validator.init($('#validator_info'),validator_target);
+});
+</script>
+{% endblock %} {% block page %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            <strong>{{ title_text }}</strong>
+        </h3>
+    </div>
+    <div class="panel-body">
+        <div id="validator_info" class="form-horizontal">
+            <div class="form-group">
+                <label for="Validator_name" class="col-sm-3 control-label">Name:</label>
+                <div class="col-sm-9">
+                    <input class="form-control" id="name" name="Validator_name" type="text" placeholder="Name"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="Validator_pwd" class="col-sm-3 control-label">PassWord:</label>
+                <div class="col-sm-9">
+                    <input class="form-control" id="pwd" name="Validator_pwd" type="text" placeholder="PassWord" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="Validator_email" class="col-sm-3 control-label">Email:</label>
+                <div class="col-sm-9">
+                    <input class="form-control" id="email" name="Validator_email" type="text" placeholder="Email" />
+                </div>
+            </div>
+            <div class="form-group">    
+                <label for="Validator_url" class="col-sm-3 control-label">Url:</label>
+                <div class="col-sm-9">
+                    <input class="form-control" id="url" name="Validator_url" type="text" placeholder="Url" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="Validator_money" class="col-sm-3 control-label">Money:</label>
+                <div class="col-sm-9">
+                    <input class="form-control" id="money" name="Validator_money" type="email" placeholder="Money" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="Validator_age" class="col-sm-3 control-label">Age:</label>
+                <div class="col-sm-9">
+                    <input class="form-control" id="age" name="Validator_age" type="text" placeholder="Age" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="Validator_birthday" class="col-sm-3 control-label">Birthday:</label>
+                <div class="col-sm-9">
+                    <input class="form-control" id="birthday" name="Validator_birthday" type="text" placeholder="Birthday" />
+                </div>
+            </div>
+            <div class="form-group">    
+                <label for="Validator_modification_date" class="col-sm-3 control-label">Modification Date:</label>
+                <div class="col-sm-9">
+                    <input class="form-control" id="modification_date" name="Validator_modification_date" type="text" placeholder="Modification Date" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="Validator_reg" class="col-sm-3 control-label">Regular:</label>
+                <div class="col-sm-9">
+                    <input class="form-control" id="reg" name="Validator_reg" type="email" placeholder="Regular" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="employee_save" type="button" class="btn btn-primary">Save</button>
+                <button id="cancel" type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

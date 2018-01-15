@@ -1,0 +1,128 @@
+{% extends 'base.html' %} {% block page %}{% load staticfiles %}
+<script type="text/javascript">
+$(function() {
+    $('#StartDate,#EndDate').datetimepicker({
+        format: 'yyyy-mm-dd',
+        autoclose:1,
+        weekStart:1,
+        startView:'month',
+        initialDate:new Date(),
+    });
+
+    //init the table and page bar
+    pagingTable();
+
+    //SaveLeave
+    $("#SaveLeave").on("click", function() { 
+        if ($("#StartDate").val() == '' || $("#EndDate").val() == '') {
+            alert("Please enter the apply date."); 
+            return false;
+        }
+        var param = $.param($('#addipModal :input:not(button)')) ;
+        $.ajax({
+            url: "{% url 'attendence:leave_add'%}",
+            method: "POST",
+            data: param + "&csrfmiddlewaretoken=" + $.cookie('csrftoken'),
+            success: function(data) {
+                $("#cancelip").click();
+                alert(data);
+                window.location.reload();
+            }
+
+        });
+    }); 
+});
+
+function pagingTable() {
+    $("#LeaveListTable").pagingTable({
+        json_url: "{% url 'attendence:leave_get_list'%}",
+        pageSize: 10,
+        callback: function() {
+            console.log('this is callback of pagingTable...');
+        }
+    });
+}
+
+function leave_approve_deny(operation, id) {
+    $.ajax({
+            url: "{% url 'attendence:leave_approve_deny'%}",
+            method: "POST",
+            data: {
+                operation: operation,
+                id: id,
+                csrfmiddlewaretoken: $.cookie('csrftoken')
+            },
+            success: function(data) {
+                window.location.reload();
+            }
+    });
+}
+
+</script>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            <strong>请假管理</strong>
+        </h3>
+    </div>
+    <div class="panel-body">
+        <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#addipModal">
+            新的请假
+        </button>
+        <hr/>
+        <div id="pagerdiv">
+            <table id="LeaveListTable" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th width="20%">姓名</th>
+                        <th width="20%">开始日期</th>
+                        <th width="20%">结束日期</th>
+                        <th width="20%">状态</th>
+                        <th width="20%">操作</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr pk="#id#" template=1 style="display: none">
+                        <td>#name#</td>
+                        <td>#start_date#</td>
+                        <td>#end_date#</td>
+                        <td>#status#</td>
+                        <td>
+                            <button id="Approve" type="button" onclick="leave_approve_deny(1, #id#)" class="btn btn-primary #btn_class#">同意</button>
+                            <button id="Deny" type="button" onclick="leave_approve_deny(2, #id#)" class="btn btn-primary #btn_class#">拒绝</button>     
+                        </td> 
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- add ip window -->
+        <div class="modal fade" id="addipModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        应用
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="StartDate">开始日期:</label>
+                            <input type="text" class="form-control" id="StartDate" name="StartDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="EndDate">结束日期:</label>
+                            <input type="text" class="form-control" id="EndDate" name="EndDate">
+                        </div> 
+                    </div>
+                    <div class="modal-footer">
+                        <button id="CancelLeave" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button id="SaveLeave" type="button" class="btn btn-primary">应用</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+1. 系统初次运行会生成一个用户，此用户将会拥有一切的权限，此用于配置在目录 /basic/config.py 名为ROOTUSER
+2. 如果设置 config.py UNITTEST为1，则始终使用sqllite数据库，否则，测试的时候使用sqllite数据库，实际运行的时候使用mysql数据库
+
+3. 文件命名始终遵守如下规则：
+    1）如果是class，则采用首字母大写的规则，例如：RoleRight
+    2) 如果是常量，则需要所有字母均大写
+    3）如果是方法，函数，属性一律使用小写字母和下划线来实现，例如：get_list_by_filter
+
+4. 关于url的配置，标准的配置通常有：
+    1）get_list
+    2) add
+    3) delete/(?P<id>\w{32})$
+    4) edit/(?P<id>\w{32})$    
+
+5. 所有views中函数的定义中，必须加上函数的简单描述，也就是此函数是做什么的，例如：
+    def index(request):
+        '''load the basic page for user to manage the employee'''
+        pass
+
+6. views中所有class的名字均以下划线来开头，例如_User
+
+7. linux install wechat_sdk
+    1) sudo apt-get install python3-dev
+    2) pip install wechat_sdk       

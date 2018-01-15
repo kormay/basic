@@ -1,0 +1,128 @@
+{% extends 'todolist/base.html' %} {% block page %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            步骤
+        </h3>
+    </div>
+    <!-- list:begin -->
+    <div class="panel-body">
+        <div class="form-group">
+            <button id="btn_get_add_step" type="button" class="btn btn-primary btn-md">
+                添加步骤
+            </button>
+        </div>
+        <table id="list_step" class="table table-bordered table-hover table-striped">
+            <thead>
+                <tr>
+                    <th width="20%">步骤名称</th>
+                    <th width="20%">步骤说明</th>
+                    <th width="20%">添加时间</th>
+                    <th width="20%">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr pk="#id#" template=1 style="display: none">
+                    <td>#name#</td>
+                    <td>#description#</td>
+                    <td>#entry_date#</td>
+                    <td>
+                        <a href="javascript:void(0)" operation="del">删除</a>
+                        <a href="javascript:void(0)" operation="edit">修改</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- list:end -->
+    <!-- add step:begin -->
+    <div class="modal fade" id="step_detail">
+        <input type="hidden" name="id">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    添加
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label style="width:100%">
+                            <span>步骤名称:</span>
+                            <input type="text" class="form-control" name="name" placeholder="" value="">
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label style="width:100%">
+                            <span>步骤说明:</span>
+                            <input type="text" class="form-control" name="description" placeholder="" value="">
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- add step:end -->
+</div>
+<script type="text/javascript">
+function popoludate_step() {
+    $("#list_step").pagingTable({
+        json_url: "{% url 'todolist:step_list' %}"
+    });
+}
+
+popoludate_step();
+
+$("#btn_get_add_step").click(function() {
+    $("#step_detail").Reset().modal();
+});
+
+$("#step_detail button:contains(Save)").click(function() {
+    var id = $("#step_detail").find('input[name=id]').val();
+
+    url = id ? "{% url 'todolist:step_edit'%}" : "{% url 'todolist:step_add'%}";
+    Class.ajax({
+        url: url,
+        method: "post",
+        data: $("#step_detail").Param() + '&csrfmiddlewaretoken=' + $.cookie('csrftoken'),
+        success: function(data) {
+            if (data = '50000') {
+                popoludate_step();
+            }
+        }
+    });
+});
+
+$("#list_step").on('click', 'a', function() {
+    var operation = $(this).attr('operation');
+    var id = $(this).parents('tr').eq(0).attr('pk');
+
+    if (operation == 'del') {
+        Class.confirm('', function() {
+            Class.ajax({
+                url: "{% url 'todolist:step_delete'%}",
+                method: "post",
+                data: 'id=' + id + '&csrfmiddlewaretoken=' + $.cookie('csrftoken'),
+                success: function(data) {
+                    if (data = '50000') {
+                        popoludate_step()
+                    }
+                }
+            });
+        })
+    } else if (operation == 'edit') {
+        $("#step_detail").modal().find('input[name=id]').val(id);
+        Class.ajax({
+            url: "{% url 'todolist:step_edit'%}",
+            method: "get",
+            data: $("#step_detail").Param() + '&csrfmiddlewaretoken=' + $.cookie('csrftoken'),
+            success: function(response) {
+                $("#step_detail").Param(response);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

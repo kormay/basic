@@ -1,0 +1,83 @@
+{% extends 'resource/root.html' %} 
+{% block welcome %}
+<a href="{% url 'cms:index' %}" class="navbar-brand">欢迎来到简约博客</a>
+{% endblock %}
+{% block additional %}
+<div class="jumbotron">
+    <div class="container">
+        <h1>简约博客</h1>
+        <h3>你自己的代码如果超过6个月不看，再看的时候也一样像是别人写的。—— 伊格尔森定律</h3>
+    </div>
+</div>
+{% endblock %}
+
+{% block main %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 column">
+            <div class="btn-group">
+                <a href="{% url 'cms:index' %}">
+                    <button class="btn btn-primary" type="button">
+                        <em class="glyphicon glyphicon-home"></em> 首页
+                    </button>
+                </a>
+                <a href="{% url 'cms:get_category_key_list' %}">
+                    <button class="btn btn-primary" type="button" >
+                        <em class="glyphicon glyphicon-edit"></em> 写博客 
+                    </button>
+                </a>
+                <a href="{% url 'cms:get_category_list' %}">
+                    <button class="btn btn-primary" type="button">
+                        <em class="glyphicon glyphicon-th-list"></em> 管理
+                    </button>
+                </a> 
+            </div>
+            <hr>
+            <div id="page">
+            {% block page %} {% endblock %}
+            </div>
+        </div>
+        <div class="col-md-1 column">
+        </div>
+        <div class="col-md-3 column">
+            <div class="input-group">
+                <input type="text" class="form-control">
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="button">
+                        查询
+                    </button>
+                </span>
+            </div>
+            <hr>
+            <div class="panel-group" id="panel-318736">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-318736" href="#panel-element-908542">分类</a>
+                    </div>
+                    <div id="panel-element-908542" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            Python
+                        </div>
+                        <div class="panel-body">
+                            Django
+                        </div>
+                        <div class="panel-body">
+                            Javascript
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-318736" href="#panel-element-947108">写博客</a>
+                    </div>
+                    <div id="panel-element-947108" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            Anim pariatur cliche...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

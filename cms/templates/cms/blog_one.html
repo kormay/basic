@@ -1,0 +1,16 @@
+{% extends 'cms/base.html' %} 
+{% block page %}
+<h2>
+{{ content.title }}
+</h2>
+<h6>{{ content.entry_date }}</h6>
+<p name="content">
+</p>
+<p class="hide">{{ content.description }}</p>
+
+<script type="text/javascript">
+    $(function(){
+        $('p[name=content]').html($('p[name=content]').next().text());
+    });
+</script>
+{% endblock %}

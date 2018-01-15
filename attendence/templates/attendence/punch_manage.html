@@ -1,0 +1,350 @@
+{% extends 'base.html' %} {% block page %}
+<script type="text/javascript">
+$(function() {
+    $('#punch_time').val(get_currenttime());
+    $('#punch_time').datetimepicker({
+        format: 'yyyy-mm-dd hh:ii',
+        autoclose:1,
+        weekStart:1,
+        startView:'month',
+        initialDate:new Date(),
+    });
+
+    $('#punchtime_search_start,#punchtime_search_stop').val(get_yesterday());
+    $('#punchtime_search_start,#punchtime_search_stop').datetimepicker({
+        format: 'yyyy-mm-dd',
+        minView:'month',
+        autoclose:1,
+        weekStart:1,
+        startView:'month',
+        initialDate:new Date(),
+    });
+    init_listtable();
+    $('#save').click(function(){
+            if($('#user_name').val() == '0'){
+                Confirm.show('Confirm', 'Please select a user.')
+            }
+            else if(!$('#punch_time').val().match(/^\d{4}\-\d{2}\-\d{2}\s\d{2}\:\d{2}$/)){
+                Confirm.show('Confirm', 'Please enter a correct date.')
+            }
+            else{
+                if($('#user_name').attr('flag') == '1'){
+                    $.ajax({
+                        type:"POST",
+                        url:"{% url 'attendence:punch_edit' %}",
+                        data:"user_name="+$('#user_name').val() + "&punch_time="+ $('#punch_time').val() +"&id=" + $('#user_name').attr("punch_id_flag") + "&csrfmiddlewaretoken=" + $("input[name='csrfmiddlewaretoken']").val(),
+                        dataType:"text",
+                        success:function(response){
+                            // alert(response);
+                            Confirm.show('Message', response);
+                            $('#cancel').click();
+                            init_listalltable();
+                        },
+                    });
+                }
+                else{
+                    $.ajax({
+                        type:"POST",
+                        url:"{% url 'attendence:punch_add' %}",
+                        // data:$('#addpunchModal').param() + "&csrfmiddlewaretoken=" + $("input[name='csrfmiddlewaretoken']").val(),
+                        data:"user_name="+$('#user_name').val() + '&punch_time=' + $('#punch_time').val() + "&csrfmiddlewaretoken=" + $("input[name='csrfmiddlewaretoken']").val(),
+                        dataType:"text",
+                        success:function(response){
+                            Confirm.show('Message', response);
+                            $('#cancel').click();
+                            init_listtable();
+                        },
+                    });
+            }
+        }
+    });    
+
+    $('#search_button').click(function(){
+        if(!$('#punchtime_search_start').val().match(/^\d{4}\-\d{2}\-\d{2}$/) || !$('#punchtime_search_stop').val().match(/^\d{4}\-\d{2}\-\d{2}$/)){
+            Confirm.show('Confirm', 'Please enter a correct date to search.')
+        }
+        else{
+            $("#punchlisttable").pagingTable({
+                json_url: "punch/get_list_by_filter/?" 
+                + "user_name_search=" + $('#user_name_search').val() 
+                + "&punchtime_search_start=" + $('#punchtime_search_start').val() 
+                + "&punchtime_search_stop=" + $('#punchtime_search_stop').val(),
+                pageSize: 10
+            });
+        }
+    });
+
+    // part2
+    $('#punchdate_searchall').val(get_yesterday());
+    $('#punchdate_searchall').datetimepicker({
+        format: 'yyyy-mm-dd',
+        minView:'month',
+        autoclose:1,
+        weekStart:1,
+        startView:'month',
+        initialDate:new Date(),
+    });
+
+    $('#searchall_button').click(function(){
+        init_listalltable();
+    });
+
+    $('#addpunchModal').on('shown.bs.modal', function(e) {
+        if ($(e.relatedTarget).is('#add_button')) {
+            $('#user_name').removeAttr('flag');
+            $('#user_name').removeAttr('punch_id_flag');
+            $('#user_name').removeAttr('disabled');
+            $('#user_name').val("0");
+            $('#punch_time').val(get_currenttime());
+        } else if ($(e.relatedTarget).is("button[name='edit']")) {
+            $('#user_name').val($(e.relatedTarget).attr("field"));
+            $('#user_name').attr('flag', '1');
+            $('#user_name').attr('punch_id_flag', $(e.relatedTarget).attr("data-pk"));
+            $('#user_name').attr('disabled', true);
+        }
+    });
+    $('#addpunchModal').on('hide.bs.modal', function(e) {
+        // $('#addpunchModal').clear();
+        // $('#user_name').removeAttr('disabled');
+        // $('#user_name').val("0");
+    });
+
+    Confirm.init('md');
+    $('button[name=delete]').unbind();
+    $('#punchalllisttable').on('click', 'button[name=delete]', function(e) {
+        e.preventDefault();
+        if($(this).parent().parent().attr("field") == "Yes"){
+            Confirm.show('Message', 'You can not change this record.');
+        }
+        else{
+            var id = $(this).attr("data-pk");
+            Confirm.show('Confirm', 'Are you sure to delete this record?', {
+                'Delete': {
+                    'primary': true,
+                    'callback': function() {
+                        $.ajax({
+                            type:"POST",
+                            url:"{% url 'attendence:punch_delete' %}",
+                            data:"id=" + id +"&csrfmiddlewaretoken=" + $.cookie('csrftoken'),
+                            dataType:"text",
+                            success:function(response){
+                                init_listalltable();
+                                Confirm.show('Message', response);
+                            },
+                        });
+                    }
+                }
+            });
+        }//endelse
+    });
+
+    $('button[name=edit]').unbind();
+    $('#punchalllisttable').on('click', 'button[name=edit]', function(e) {
+        e.preventDefault();
+        if($(this).parent().parent().attr("field") == "Yes"){
+            Confirm.show('Message', 'You can not change this record.');
+        }
+        else{
+            $(this).attr("data-target","#addpunchModal");
+            $('#punch_time').val($(this).parent().parent().prevAll().eq(2).attr("field"));
+        }//endelse
+    });
+
+});
+
+function init_listtable(){
+    $("#punchlisttable").pagingTable({
+        json_url: "punch/get_list_by_filter/?" + "user_name_search=0&punchtime_search_start=" 
+        + $('#punchtime_search_start').val() + "&punchtime_search_stop=" + $('#punchtime_search_stop').val(),
+        pageSize: 10
+    });
+}
+
+function init_listalltable(){
+    $("#punchalllisttable").pagingTable({
+        json_url: "punch/get_all_list_by_filter/?" 
+                + "user_name_searchall=" + $('#user_name_searchall').val() 
+                + "&punchdate_searchall=" + $('#punchdate_searchall').val(),
+        pageSize: 10
+    });
+}
+
+function get_currenttime(){
+    var date = new Date();
+    var minutes = '0' + date.getMinutes();
+    minutes = minutes.substr(minutes.length-2);
+    var month = '0' + (date.getMonth() + 1);
+    month = month.substr(month.length-2);
+    var date1 = '0' + date.getDate();
+    date1 = date1.substr(date1.length-2);
+    var hours = '0' + date.getHours()
+    hours = hours.substr(hours.length-2)
+    var date_str = date.getFullYear() + '-' + month + '-' + date1 +
+        ' ' + hours + ':' + minutes;
+    return date_str;
+}
+function get_yesterday(){
+    var date = new Date();
+    date.setDate(date.getDate()-1);
+    var month = '0' + (date.getMonth() + 1);
+    month = month.substr(month.length-2);
+    var date1 = '0' + date.getDate();
+    date1 = date1.substr(date1.length-2);
+    var date_str = date.getFullYear() + '-' + month + '-' + date1;
+    return date_str;
+}
+
+</script>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tabbable" id="tabs-841823">
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#panel-676126" data-toggle="tab">打卡信息</a>
+                    </li>
+                    <li>
+                        <a href="#panel-801309" data-toggle="tab">所有打卡记录</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="panel-676126">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <button type="button" right="attendence.views.punch.add" id="add_button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#addpunchModal">
+                                    添加新纪录
+                                    </button>
+                                </div>
+                                <div class="col-md-3">
+                                    <select id="user_name_search" name="user_name_search" class="form-control">
+                                        <option value="0">请选择一个用户...</option>
+                                        {%for user in userlist%}
+                                        <option value="{{user.user_name}}">{{user.full_name}}</option>
+                                        {%endfor%}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input id="punchtime_search_start" class="form-control" type="text" value="">
+                                </div>
+                                <div class="col-md-2">
+                                    <input id="punchtime_search_stop" class="form-control" type="text" value="">
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" id="search_button" class="btn btn-primary btn-md">
+                                    查询
+                                    </button>
+                                </div>
+                            </div>
+                            <strong>打卡信息</strong>
+                            <div id="pagerdiv">
+                                    <table id="punchlisttable" class="table table-bordered table-hover table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th width="20%">姓名</th>
+                                                <th width="20%">开始打卡</th>
+                                                <th width="20%">最后打卡</th>
+                                                <th width="20%">打卡日期</th>
+                                                <th width="20%">状态</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr pk="#index#" template=1 style="display: none">
+                                                <td style="color:#color#">#full_name#</td>
+                                                <td style="color:#color#">#entry_date_start#</td>
+                                                <td style="color:#color#">#entry_date_end#</td>
+                                                <td style="color:#color#">#punch_date#</td>
+                                                <td style="color:#color#">#Status#</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="panel-801309">
+                        <div class="panel-body">
+                            <form class="form-horizontal" role="form">
+                                <div class="form-group" style="margin-left:0px">
+                                    <div class="form-group col-md-2">
+                                        <select id="user_name_searchall" name="user_name_searchall" class="form-control" data-toggle="modal">
+                                            {%for user in userlist%}
+                                            <option value="{{user.user_name}}">{{user.full_name}}</option>
+                                            {%endfor%}
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <input id="punchdate_searchall" class="form-control" type="text" value="">
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <button type="button" id="searchall_button" class="btn btn-primary btn-md">
+                                        查询所有打卡记录
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            <div id="pageralldiv">
+                                    <table id="punchalllisttable" class="table table-bordered table-hover table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th width="20%">姓名</th>
+                                                <th width="20%">打卡时间</th>
+                                                <th width="20%">打卡日期</th>
+                                                <th width="20%">状态</th>
+                                                <th width="20%">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr pk="#punch_id#" template=1 style="display: none">
+                                                <td>#full_name#</td>
+                                                <td field="#punch_time#">#punch_time#</td>
+                                                <td>#punch_date#</td>
+                                                <td>#is_normal#</td>
+                                                <td field="#is_normal#">
+                                                    <div class="btn-group" role="group" aria-label="...">
+                                                        <button name="delete" type="button" class="btn btn-primary btn-xs" data-pk="#punch_id#"><span class="glyphicon glyphicon-trash"></span></button>
+                                                        <button name="edit" field="#user_name#" type="button" class="btn btn-primary btn-xs" data-toggle="modal"  data-pk="#punch_id#"><span class="glyphicon glyphicon-edit"></span></button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- add punch info window -->
+    <div class="modal fade" id="addpunchModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                   添加新的打卡记录
+                </div>
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="user_name">用户:</label>
+                        <select id="user_name" name="user_name" class="form-control">
+                            <option value="0">请选择一个用户...</option>
+                            {%for user in userlist%}
+                            <option value="{{user.user_name}}">{{user.full_name}}</option>
+                            {%endfor%}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="punch_time">打卡时间:</label>
+                        <input id="punch_time" class="form-control" type="text" value="">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancel" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button id="save" type="button" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

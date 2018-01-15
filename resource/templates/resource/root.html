@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ title_text }}</title>
+    {% load staticfiles %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" media="screen">
+    <link href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet" media="screen">
+    <link href="{% static 'attendence/base.css' %}" rel="stylesheet" media="screen">
+    
+    <script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/json2.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/Class.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}" charset="UTF-8"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/js/locales/bootstrap-datetimepicker.fr.js' %}" charset="UTF-8"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/js/confirm.js' %}" charset="UTF-8"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap-confirm.js' %}" charset="UTF-8"></script>
+    <script type="text/javascript" src="{% static 'js/jqExtend.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/pager.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.cookie.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/validator.js' %}"></script>
+    {% block head %} {% endblock %}
+    <style type="text/css">
+    /*.panel-body a{
+        font-size: 1.25em;
+    }*/
+    </style>
+    <script type="text/javascript">
+        {% if validator %}
+            var validator_target={{ validator|safe }};
+        {% else %}
+            var validator_target={};
+        {% endif %}
+    </script>
+</head>
+
+<body>
+    <header class="navbar navbar-inverse navbar-fixed-top bs-docs-nav" role="banner">
+        <div class="container">
+            <div class="navbar-header">
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+                </button>
+                {% block welcome %} {% endblock %}
+                <!-- <a href="{% url 'attendence:index' %}" class="navbar-brand">Welcome to Attendence System</a> -->
+            </div>
+            <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+                <ul class="nav navbar-nav">
+                    <li> <a href="{% url 'attendence:index' %}">考勤系统</a> </li>
+                    <li> <a href="{% url 'secu:index' %}">权限管理系统</a> </li>
+                    <li> <a href="{% url 'cms:index' %}">内容管理系统</a> </li>
+                    <li> <a href="{% url 'todolist:item' %}">任务管理系统</a> </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li> <a href="#">关于</a> </li>
+                    <li> <a href="{% url 'logout' %}">退出</a> </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div>
+        {% block additional %} {% endblock %}
+    </div>
+    
+    <div class="container-fluid">
+        <div class="row main">
+           {% block main %} {% endblock %}
+        </div>
+    </div>
+    
+    <footer class="footer navbar navbar-default navbar-bottom bs-docs-nav">
+      <div class="container">
+        <hr>
+        <div class="row footer-bottom">
+          <ul class="list-inline text-center">
+            <li>联系我们</li><li>关于</li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,170 @@
+{% extends 'cms/base.html' %}
+{% block page %}
+<br>
+<div class="col-md-12">
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#article" aria-controls="article" role="tab" data-toggle="tab">文章管理</a>
+        </li>
+        <li role="presentation">
+            <a href="#category" aria-controls="category" role="tab" data-toggle="tab">类别管理</a>
+        </li>
+        <li role="presentation">
+            <a href="#draft" aria-controls="draft" role="tab" data-toggle="tab">草稿箱</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="article">
+        <br>
+        <form class="form-inline">
+            <div class="form-group">
+                <select id="category_blog" class="form-control">
+                    <option value="0">全部分类</option>
+                    {% for item in category %}
+                    <option value="{{item.code}}">{{item.title}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="button" id="search_blogs" class="btn btn-primary" value="搜索" >
+        </form>
+        <br>
+        <div id="pagerdiv">
+            <table id="punchlisttable" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th width="20%">文章标题</th>
+                        <th width="20%">类别</th>
+                        <th width="20%">书写时间</th>
+                        <th width="20%">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr pk="" template=1 style="display: none">
+                        <td><a href="../../../cms/get_content_list_by_filter/#id#">#title#</a></td>
+                        <td>#category#</td>
+                        <td>#entry_date#</td>
+                        <td>
+                            <div class="btn-group" >
+                                <button name="delete" type="button" class="btn btn-primary btn-xs" pk="#id#">
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                </button>
+                                <a href="../../../cms/get_category_key_list/?id=#id#">
+                                    <button name="edit" field="#user_name#" type="button" pk="#id#" class="btn btn-primary btn-xs" data-toggle="modal">
+                                        <span class="glyphicon glyphicon-edit"></span>
+                                    </button>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="category">
+        <br/>
+        <div class="input-group col-md-6">
+            <input id="category_input" type="text" class="form-control" placeholder="输入要添加的分类名...">
+            <span class="input-group-btn">
+                <button id="add_category" class="btn btn-primary" type="button">添加</button>
+            </span>
+        </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="draft">
+        
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+$('#search_blogs').click(function(){
+    init_table();
+});
+
+function init_table(){
+    $("#punchlisttable").pagingTable({
+        json_url: "get_content_list_by_category/?category=" + $('#category_blog').val(),
+        pageSize: 10
+    });
+}
+
+$('#add_category').click(function(){
+    var category_input = $('#category_input').val();
+    if(category_input == ''){
+        Confirm.show('Message','请输入一个类别名。');
+    }
+    else{
+        Class.ajax({
+            type:"POST",
+            url:"{% url 'cms:add_category' %}",
+            data:{
+                "category":category_input,
+                "csrfmiddlewaretoken":$.cookie('csrftoken')
+            },
+            datType:"text",
+            success:function(response){
+                Confirm.show('Message',response);
+            }
+        });
+        // setTimeout(function(){
+        //     Class.ajax({
+        //         type:"POST",
+        //         url:"{% url 'cms:add_category' %}",
+        //         data:{
+        //             "category":category_input + '_xcxcxc',
+        //             "csrfmiddlewaretoken":$.cookie('csrftoken')
+        //         },
+        //         datType:"text",
+        //         success:function(response){
+        //             Confirm.show('Message',response);
+        //         }
+        //     });
+        // },5000);
+
+    }
+});
+
+$('#punchlisttable').on('click','button[name=delete]',function(e){
+    e.preventDefault();
+    var id = $(this).attr("pk");
+    Confirm.show("Confirm","Are you sure to delete this record?",{
+        'Delete': {
+            'primary': true,
+            'callback': function() {
+                Class.ajax({
+                    type:"POST",
+                    url:"{% url 'cms:content_delete' %}",
+                    data:"id=" + id +"&csrfmiddlewaretoken=" + $.cookie('csrftoken'),
+                    dataType:"text",
+                    success:function(response){
+                        init_table();
+                        Confirm.show('Message', response);
+                    },
+                });
+            }
+        }
+    })
+})
+
+// $('#delete').click(function(){
+//     alert(1);
+//     var id = $(this).attr("pk");
+//     Confirm.show("Confirm","Are you sure to delete this record?",{
+//         'Delete': {
+//             'primary': true,
+//             'callback': function() {
+//                 $.ajax({
+//                     type:"POST",
+//                     url:"{% url 'cms:content_delete' %}",
+//                     data:"id=" + id +"&csrfmiddlewaretoken=" + $.cookie('csrftoken'),
+//                     dataType:"text",
+//                     success:function(response){
+//                         Confirm.show('Message', response);
+//                     },
+//                 });
+//             }
+//         }
+//     })
+// })
+
+</script>
+{%endblock%}
